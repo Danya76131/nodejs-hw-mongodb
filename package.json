@@ -1,0 +1,37 @@
+{
+  "name": "nodejs-hw-mongodb",
+  "version": "1.0.0",
+  "type": "module",
+  "main": "index.js",
+  "scripts": {
+    "start": "node src/index.js",
+    "dev": "nodemon src/index.js",
+    "lint": "eslint .",
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/Danya76131/nodejs-hw-mongodb.git"
+  },
+  "keywords": [],
+  "author": "Danylo Haletskyi <danylo.galetskiy@gmail.com>",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/Danya76131/nodejs-hw-mongodb/issues"
+  },
+  "homepage": "https://github.com/Danya76131/nodejs-hw-mongodb#readme",
+  "description": "",
+  "dependencies": {
+    "cors": "^2.8.5",
+    "dotenv": "^17.2.1",
+    "express": "^5.1.0",
+    "mongoose": "^8.18.0",
+    "pino": "^9.9.0",
+    "pino-http": "^10.5.0"
+  },
+  "devDependencies": {
+    "eslint": "^9.34.0",
+    "nodemon": "^3.1.10",
+    "prettier": "^3.6.2"
+  }
+}
