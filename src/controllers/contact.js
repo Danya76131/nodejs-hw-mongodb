@@ -1,6 +1,7 @@
+import mongoose from 'mongoose';
 import { getAllContacts, getContactById } from '../services/contact.js';
 
-export const getContactsControllers = async (req, res) => {
+export const getContactsController = async (req, res) => {
   const contacts = await getAllContacts();
   res.json({
     status: 200,
@@ -9,8 +10,9 @@ export const getContactsControllers = async (req, res) => {
   });
 };
 
-export const getContactByIdControllers = async (req, res) => {
+export const getContactByIdController = async (req, res) => {
   const { contactId } = req.params;
+
   const contact = await getContactById(contactId);
 
   if (!contact) {
