@@ -1,23 +1,24 @@
 import express from 'express';
 import cors from 'cors';
 import pino from 'pino-http';
-import {
-  getContactByIdController,
-  getContactsController,
-} from './controllers/contact.js';
+import contactRouter from './routers/contacts.js';
+import errorHandler from './middlewares/errorHandler.js';
+import notFoundHandler from './middlewares/notFoundHandler.js';
 
 export const setupServer = () => {
   const app = express();
 
   app.use(cors());
   app.use(pino());
+  app.use(express.json()); //  щоб читати JSON з body
 
-  app.get('/contacts', getContactsController);
-  app.get('/contacts/:contactId', getContactByIdController);
+  app.use('/contacts', contactRouter);
 
-  app.use((req, res) => {
-    res.status(404).json({ message: 'Non found' });
-  });
+  //  якщо маршрут не знайдений
+  app.use(notFoundHandler);
+
+  //  глобальний обробник помилок
+  app.use(errorHandler);
 
   const PORT = process.env.PORT || 3000;
   app.listen(PORT, () => {
