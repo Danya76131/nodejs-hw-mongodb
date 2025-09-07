@@ -8,7 +8,8 @@ import {
 import createHttpError from 'http-errors';
 
 export const getContactsController = async (req, res) => {
-  const contacts = await getAllContacts();
+  console.log('Query Parameters:', req.query); // Додано логування
+  const contacts = await getAllContacts(req.query);
   res.json({
     status: 200,
     message: 'Successfully found contacts!',
