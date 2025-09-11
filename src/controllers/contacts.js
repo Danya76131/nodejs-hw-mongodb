@@ -6,9 +6,10 @@ import {
   updateContact,
 } from '../services/contacts.js';
 import createHttpError from 'http-errors';
+import { authenticate } from '../middlewares/authenticate.js';
 
 export const getContactsController = async (req, res) => {
-  const contacts = await getAllContacts(req.query);
+  const contacts = await getAllContacts(req.query, req.user._id);
   res.json({
     status: 200,
     message: 'Successfully found contacts!',
@@ -19,7 +20,7 @@ export const getContactsController = async (req, res) => {
 export const getContactByIdController = async (req, res) => {
   const { contactId } = req.params;
 
-  const contact = await getContactById(contactId);
+  const contact = await getContactById(contactId, req.user._id);
 
   if (!contact) {
     return res.status(404).json({ message: 'Contact not found' });
@@ -32,7 +33,8 @@ export const getContactByIdController = async (req, res) => {
 };
 
 export const createContactController = async (req, res) => {
-  const contact = await createContact(req.body);
+  const body = { ...req.body, userId: req.user._id };
+  const contact = await createContact(body);
   res.status(201).json({
     status: 201,
     message: 'Succesfully created a contact!',
@@ -42,7 +44,7 @@ export const createContactController = async (req, res) => {
 
 export const updateContactController = async (req, res) => {
   const { contactId } = req.params;
-  const contact = await updateContact(contactId, req.body);
+  const contact = await updateContact(contactId, req.body, req.user._id);
   if (!contact) throw createHttpError(404, 'Contact not found');
 
   res.json({
@@ -54,7 +56,7 @@ export const updateContactController = async (req, res) => {
 
 export const deleteContactController = async (req, res) => {
   const { contactId } = req.params;
-  const contact = await deleteContact(contactId);
+  const contact = await deleteContact(contactId, req.user._id);
 
   if (!contact) throw createHttpError(404, 'Contact not found');
 

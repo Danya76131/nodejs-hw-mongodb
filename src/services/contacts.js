@@ -1,6 +1,7 @@
 import { Contact } from '../models/contacts.js';
 
-export const getAllContacts = async (query) => {
+// отримати всі контакти конкретного користувача з пагінацією, сортуванням, фільтром
+export const getAllContacts = async (query, userId) => {
   const {
     page = 1,
     perPage = 10,
@@ -9,23 +10,25 @@ export const getAllContacts = async (query) => {
     type,
     isFavourite,
   } = query;
+
   const pageNum = Number(page);
   const perPageNum = Number(perPage);
   const skip = (pageNum - 1) * perPageNum;
   const sortOption = { [sortBy]: sortOrder === 'asc' ? 1 : -1 };
 
-  //FILTER
-  const filter = {};
+  // FILTER
+  const filter = { userId };
   if (type) filter.contactType = type;
   if (isFavourite !== undefined) filter.isFavourite = isFavourite === 'true';
-  //END FILTER
+
   const totalItems = await Contact.countDocuments(filter);
 
   const contacts = await Contact.find(filter)
     .sort(sortOption)
     .skip(skip)
-    .limit(Number(perPage));
-  const totalPages = Math.ceil(totalItems / perPage);
+    .limit(perPageNum);
+
+  const totalPages = Math.ceil(totalItems / perPageNum);
 
   return {
     data: contacts,
@@ -33,23 +36,23 @@ export const getAllContacts = async (query) => {
     perPage: perPageNum,
     totalItems,
     totalPages,
-    hasPreviousPage: Number(page) > 1,
-    hasNextPage: Number(page) < totalPages,
+    hasPreviousPage: pageNum > 1,
+    hasNextPage: pageNum < totalPages,
   };
 };
 
-export const getContactById = async (id) => {
-  return Contact.findById(id);
+export const getContactById = async (id, userId) => {
+  return Contact.findOne({ _id: id, userId });
 };
 
 export const createContact = (data) => {
   return Contact.create(data);
 };
 
-export const updateContact = (id, data) => {
-  return Contact.findByIdAndUpdate(id, data, { new: true });
+export const updateContact = async (id, data, userId) => {
+  return Contact.findOneAndUpdate({ _id: id, userId }, data, { new: true });
 };
 
-export const deleteContact = (id) => {
-  return Contact.findByIdAndDelete(id);
+export const deleteContact = async (id, userId) => {
+  return Contact.findOneAndDelete({ _id: id, userId });
 };
