@@ -44,12 +44,24 @@ export const refreshController = async (req, res) => {
   });
 };
 
-export const logoutController = async (req, res) => {
-  const { refreshToken } = req.cookies;
-  await logoutSession(refreshToken);
-  res.clearCookie('refreshToken', {
-    httpOnly: true,
-    secure: process.env.COOKIE_SECURE === 'true',
-  });
-  res.status(204).send();
+export const logoutController = async (req, res, next) => {
+  try {
+    const header = req.get('Authorization') || '';
+    const accessToken = header.replace('Bearer', '');
+    const { refreshToken } = req.cookies;
+
+    if (!refreshToken && !accessToken) {
+      return res
+        .status(400)
+        .json({ status: 400, message: 'No tokens provided' });
+    }
+    await logoutSession({ accessToken, refreshToken });
+    res.clearCookie('refreshToken', {
+      httpOnly: true,
+      secure: process.env.COOKIE_SECURE === 'true',
+    });
+    res.status(204).send();
+  } catch (err) {
+    next(err);
+  }
 };
