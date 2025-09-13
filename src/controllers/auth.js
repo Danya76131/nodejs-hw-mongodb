@@ -71,7 +71,7 @@ export const logoutController = async (req, res, next) => {
 
     if (!refreshToken || !sessionId) {
       return res
-        .status(400)
+        .status(401)
         .json({ status: 401, message: 'No refresh token provided' });
     }
 
