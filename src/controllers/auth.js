@@ -19,10 +19,10 @@ export const registerController = async (req, res) => {
 
 export const loginController = async (req, res, next) => {
   try {
-    const { accessToken, refreshToken, user } = await loginUser(req.body);
+    const { accessToken, refreshToken, sessionId } = await loginUser(req.body);
 
     res.cookie('refreshToken', refreshToken, COOKIE_OPTIONS);
-    res.cookie('userId', user._id.toString(), COOKIE_OPTIONS);
+    res.cookie('sessionId', sessionId.toString(), COOKIE_OPTIONS);
 
     res.json({
       status: 200,
@@ -34,36 +34,50 @@ export const loginController = async (req, res, next) => {
   }
 };
 
-export const refreshController = async (req, res) => {
-  const { refreshToken } = req.cookies;
-  const { accessToken, refreshToken: newRefresh } =
-    await refreshSession(refreshToken);
+export const refreshController = async (req, res, next) => {
+  try {
+    const { refreshToken, sessionId } = req.cookies;
 
-  res.cookie('refreshToken', newRefresh, COOKIE_OPTIONS);
-  res.json({
-    status: 200,
-    message: 'Succesfully refreshed a session!',
-    data: { accessToken },
-  });
+    if (!refreshToken || !sessionId) {
+      return res
+        .status(400)
+        .json({ status: 401, message: 'No tokens provided' });
+    }
+
+    const { accessToken, refreshToken: newRefresh } = await refreshSession({
+      sessionId,
+      refreshToken,
+    });
+    res.cookie('refreshToken', newRefresh, COOKIE_OPTIONS);
+    res.cookie('sessionId', sessionId, COOKIE_OPTIONS);
+
+    res.json({
+      status: 200,
+      message: 'Succesfully refreshed a session!',
+      data: { accessToken },
+    });
+  } catch (err) {
+    next(err);
+  }
 };
 
 export const logoutController = async (req, res, next) => {
   try {
-    const { refreshToken, userId } = req.cookies;
+    const { refreshToken, sessionId } = req.cookies;
 
-    if (!refreshToken || !userId) {
+    if (!refreshToken || !sessionId) {
       return res
         .status(400)
-        .json({ status: 400, message: 'No refresh token provided' });
+        .json({ status: 401, message: 'No refresh token provided' });
     }
 
-    await Session.findOneAndDelete({ refreshToken, userId });
+    await Session.findOneAndDelete({ refreshToken, _id: sessionId });
 
     res.clearCookie('refreshToken', {
       httpOnly: true,
       secure: process.env.COOKIE_SECURE === 'true',
     });
-    res.clearCookie('userId', {
+    res.clearCookie('sessionId', {
       httpOnly: true,
       secure: process.env.COOKIE_SECURE === 'true',
     });

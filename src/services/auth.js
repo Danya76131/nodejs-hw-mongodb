@@ -60,8 +60,12 @@ export const loginUser = async ({ email, password }) => {
   };
 };
 
-export const refreshSession = async (refreshToken) => {
-  if (!refreshToken) throw createHttpError(401, 'Refresh token missing');
+export const refreshSession = async ({ sessionId, refreshToken }) => {
+  if (!refreshToken || !sessionId)
+    throw createHttpError(401, 'No tokens provided');
+
+  const prevSession = await Session.findOne({ _id: sessionId, refreshToken });
+  if (!prevSession) throw createHttpError(401, 'Session not found');
 
   let payload;
   try {
@@ -70,10 +74,7 @@ export const refreshSession = async (refreshToken) => {
     throw createHttpError(401, 'Invalid refresh token');
   }
 
-  const prevSession = await Session.findOne({ refreshToken });
-  if (!prevSession) throw createHttpError(401, 'Session not found');
-
-  await Session.deleteOne({ _id: prevSession._id });
+  await Session.deleteOne({ _id: sessionId });
 
   const accessToken = signToken({ userId: payload.userId }, ACCESS_EXPIRES);
   const newRefreshToken = signToken(
@@ -99,9 +100,9 @@ export const refreshSession = async (refreshToken) => {
   return { accessToken, refreshToken: newRefreshToken, sessionId: session._id };
 };
 
-export const logoutSession = async ({ userId, refreshToken }) => {
-  if (!userId || !refreshToken) return;
-  await Session.deleteOne({ userId, refreshToken });
+export const logoutSession = async ({ sessionId, refreshToken }) => {
+  if (!sessionId || !refreshToken) return;
+  await Session.deleteOne({ _id: sessionId, refreshToken });
 };
 
 // Допоміжна функція: конвертуємо '15m'/'30d' у мілісекунди
