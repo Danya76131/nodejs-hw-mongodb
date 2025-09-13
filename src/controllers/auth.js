@@ -44,12 +44,16 @@ export const refreshController = async (req, res, next) => {
         .json({ status: 401, message: 'No tokens provided' });
     }
 
-    const { accessToken, refreshToken: newRefresh } = await refreshSession({
+    const {
+      accessToken,
+      refreshToken: newRefresh,
+      sessionId: newSessionId,
+    } = await refreshSession({
       sessionId,
       refreshToken,
     });
     res.cookie('refreshToken', newRefresh, COOKIE_OPTIONS);
-    res.cookie('sessionId', sessionId, COOKIE_OPTIONS);
+    res.cookie('sessionId', newSessionId, COOKIE_OPTIONS);
 
     res.json({
       status: 200,
