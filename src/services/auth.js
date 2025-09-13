@@ -99,12 +99,9 @@ export const refreshSession = async (refreshToken) => {
   return { accessToken, refreshToken: newRefreshToken, sessionId: session._id };
 };
 
-export const logoutSession = async ({ accessToken, refreshToken }) => {
-  const filter = {};
-  if (accessToken) filter.accessToken = accessToken;
-  if (refreshToken) filter.refreshToken = refreshToken;
-
-  await Session.deleteOne(filter);
+export const logoutSession = async ({ userId, refreshToken }) => {
+  if (!userId || !refreshToken) return;
+  await Session.deleteOne({ userId, refreshToken });
 };
 
 // Допоміжна функція: конвертуємо '15m'/'30d' у мілісекунди
