@@ -24,10 +24,17 @@ router.get(
   isValidId,
   ctrlWrapper(getContactByIdController),
 );
-
+router.post(
+  '/',
+  authenticate,
+  upload.single('photo'),
+  validateBody(createContactSchema),
+  ctrlWrapper(createContactController),
+);
 router.patch(
   '/:contactId',
   authenticate,
+  upload.single('photo'),
   isValidId,
   validateBody(updateContactSchema),
   ctrlWrapper(updateContactController),
@@ -39,11 +46,4 @@ router.delete(
   ctrlWrapper(deleteContactController),
 );
 
-router.post(
-  '/',
-  authenticate,
-  upload.single('photo'),
-  validateBody(createContactSchema),
-  ctrlWrapper(createContactController),
-);
 export default router;
