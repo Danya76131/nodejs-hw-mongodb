@@ -7,6 +7,8 @@ import {
 } from '../services/contacts.js';
 import createHttpError from 'http-errors';
 import { authenticate } from '../middlewares/authenticate.js';
+import { uploadToCloudinary } from '../services/cloudinary.js';
+import { Contact } from '../models/contacts.js';
 
 export const getContactsController = async (req, res) => {
   const contacts = await getAllContacts(req.query, req.user._id);
@@ -32,14 +34,22 @@ export const getContactByIdController = async (req, res) => {
   });
 };
 
-export const createContactController = async (req, res) => {
-  const body = { ...req.body, userId: req.user._id };
-  const contact = await createContact(body);
-  res.status(201).json({
-    status: 201,
-    message: 'Succesfully created a contact!',
-    data: contact,
-  });
+export const createContactController = async (req, res, next) => {
+  try {
+    let photoUrl = null;
+    if (req.file) {
+      photoUrl = await uploadToCloudinary(req.file.buffer);
+    }
+    const body = { ...req.body, userId: req.user._id, photo: photoUrl };
+    const contact = await Contact.create(body);
+    res.status(201).json({
+      status: 201,
+      message: 'Successfully created a contact!',
+      data: contact,
+    });
+  } catch (err) {
+    next(err);
+  }
 };
 
 export const updateContactController = async (req, res) => {

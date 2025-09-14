@@ -1,5 +1,11 @@
+import bcrypt from 'bcrypt';
+import createHttpError from 'http-errors';
+import jwt from 'jsonwebtoken';
 import { Session } from '../models/session.js';
+import { User } from '../models/user.js';
 import { loginUser, refreshSession, registerUser } from '../services/auth.js';
+import { sendResetEmail } from '../services/mailer.js';
+import 'dotenv/config';
 
 const COOKIE_OPTIONS = {
   httpOnly: true,
@@ -87,6 +93,63 @@ export const logoutController = async (req, res, next) => {
     });
 
     res.status(204).send();
+  } catch (err) {
+    next(err);
+  }
+};
+
+export const sendResetEmailController = async (req, res, next) => {
+  try {
+    const { email } = req.body;
+    const user = await User.findOne({ email });
+    if (!user) throw createHttpError(404, 'User not found!');
+
+    const token = jwt.sign({ email }, process.env.JWT_SECRET, {
+      expiresIn: '5m',
+    });
+    const link = `${process.env.APP_DOMAIN}/reset-password?token=${token}`;
+
+    try {
+      await sendResetEmail(email, link);
+    } catch {
+      throw createHttpError(
+        500,
+        'Failed to send the email, please try again later',
+      );
+    }
+
+    res.json({
+      status: 200,
+      message: 'Reset password email has been succesfully sent',
+      data: {},
+    });
+  } catch (err) {
+    next(err);
+  }
+};
+
+export const resetPasswordController = async (req, res, next) => {
+  try {
+    const { token, password } = req.body;
+    let payload;
+    try {
+      payload = jwt.verify(token, process.env.JWT_SECRET);
+    } catch {
+      throw createHttpError(401, 'Token is expired or invalid');
+    }
+    const user = await User.findOne({ email: payload.email });
+    if (!user) throw createHttpError(404, 'User not found');
+
+    const hash = await bcrypt.hash(password, 10);
+    await User.findByIdAndUpdate(user._id, { password: hash });
+
+    await Session.deleteMany({ userId: user._id });
+
+    res.json({
+      status: 200,
+      message: 'Password has been succesfully reset.',
+      data: {},
+    });
   } catch (err) {
     next(err);
   }
