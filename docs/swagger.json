@@ -79,7 +79,7 @@
         ],
         "summary": "Create a new contact",
         "operationId": "createContact",
-        "description": "Add a new contact to the database",
+        "description": "Add a new contact with optional photo",
         "security": [
           {
             "bearerAuth": []
@@ -88,9 +88,35 @@
         "requestBody": {
           "required": true,
           "content": {
-            "application/json": {
+            "multipart/form-data": {
               "schema": {
-                "$ref": "#/components/schemas/contact"
+                "type": "object",
+                "properties": {
+                  "name": {
+                    "type": "string"
+                  },
+                  "phoneNumber": {
+                    "type": "string"
+                  },
+                  "email": {
+                    "type": "string"
+                  },
+                  "isFavourite": {
+                    "type": "boolean"
+                  },
+                  "contactType": {
+                    "type": "string",
+                    "enum": [
+                      "work",
+                      "home",
+                      "personal"
+                    ]
+                  },
+                  "photo": {
+                    "type": "string",
+                    "format": "binary"
+                  }
+                }
               }
             }
           }
@@ -176,9 +202,35 @@
         "requestBody": {
           "required": true,
           "content": {
-            "application/json": {
+            "multipart/form-data": {
               "schema": {
-                "$ref": "#/components/schemas/contact"
+                "type": "object",
+                "properties": {
+                  "name": {
+                    "type": "string"
+                  },
+                  "phoneNumber": {
+                    "type": "string"
+                  },
+                  "email": {
+                    "type": "string"
+                  },
+                  "isFavourite": {
+                    "type": "boolean"
+                  },
+                  "contactType": {
+                    "type": "string",
+                    "enum": [
+                      "work",
+                      "home",
+                      "personal"
+                    ]
+                  },
+                  "photo": {
+                    "type": "string",
+                    "format": "binary"
+                  }
+                }
               }
             }
           }
@@ -239,15 +291,19 @@
         "properties": {
           "_id": {
             "type": "string",
-            "example": "64f1c2a1b5d4e8a9f0b12345"
+            "example": "68c6c93b96ee64fb7aac8b9a"
           },
           "name": {
             "type": "string",
-            "example": "Contact Name"
+            "example": "User Name"
           },
           "phoneNumber": {
             "type": "string",
-            "example": "+380671234567"
+            "example": "+381234567"
+          },
+          "email": {
+            "type": "string",
+            "example": "user@example.com"
           },
           "isFavourite": {
             "type": "boolean",
@@ -255,15 +311,20 @@
           },
           "contactType": {
             "type": "string",
+            "enum": [
+              "work",
+              "home",
+              "personal"
+            ],
             "example": "work"
           },
           "userId": {
             "type": "string",
-            "example": "64f1c2a1b5d4e8a9f0b67890"
+            "example": "68c6c88296ee64fb7aac8b82"
           },
           "photo": {
             "type": "string",
-            "example": "https://via.placeholder.com/150"
+            "example": "https://res.cloudinary.com/demo/image/upload/v12345/contacts/photo.png"
           },
           "createdAt": {
             "type": "string",
