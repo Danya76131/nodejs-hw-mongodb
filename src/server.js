@@ -6,9 +6,9 @@ import cors from 'cors';
 import pino from 'pino-http';
 import cookieParser from 'cookie-parser';
 import path from 'path';
-import { fileURLToPath } from 'url';
+import fs from 'fs';
 
-import YAML from 'yamljs';
+import YAML from 'yaml';
 import swaggerUi from 'swagger-ui-express';
 
 import contactRouter from './routers/contacts.js';
@@ -24,19 +24,27 @@ export const setupServer = () => {
   app.use(express.json());
   app.use(cookieParser());
 
-  // Swagger
-  const __filename = fileURLToPath(import.meta.url);
-  const __dirname = path.dirname(__filename);
-  const swaggerDocument = YAML.load(
-    path.join(__dirname, '../docs/openapi.yaml'),
-  );
+  // Swagger через fs + yaml
+  const swaggerFilePath = path.resolve('docs/openapi.yaml');
+
+  if (!fs.existsSync(swaggerFilePath)) {
+    console.error(' Swagger file not found at:', swaggerFilePath);
+    process.exit(1);
+  }
+
+  const swaggerFile = fs.readFileSync(swaggerFilePath, 'utf8');
+  const swaggerDocument = YAML.parse(swaggerFile);
+
   app.use('/api-docs', swaggerUi.serve, swaggerUi.setup(swaggerDocument));
 
+  // Роутери
   app.use('/auth', authRouter);
   app.use('/contacts', contactRouter);
 
+  // Middleware для 404
   app.use(notFoundHandler);
 
+  // Глобальний обробник помилок
   app.use(errorHandler);
 
   const PORT = process.env.PORT || 3000;
