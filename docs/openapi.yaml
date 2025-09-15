@@ -2,21 +2,26 @@ openapi: 3.1.0
 info:
   version: 1.0.0
   title: Contacts API
-  description: API for managing contacts
+  description: API для керування контактами користувачів
   license:
     name: Apache 2.0
     url: http://www.apache.org/licenses/LICENSE-2.0.html
-tags:
-  - name: Contacts
+
 servers:
   - url: http://localhost:3000
   - url: https://nodejs-hw-mongodb-1-g2bb.onrender.com
+
+tags:
+  - name: Contacts
+    description: Ендпоінти для роботи з контактами
+
 paths:
   /contacts:
     get:
       $ref: '../swagger/paths/contacts/get.yaml'
-    patch:
+    post:
       $ref: '../swagger/paths/contacts/post.yaml'
+
   /contacts/{contactId}:
     get:
       $ref: '../swagger/paths/contacts/{id}/get.yaml'
@@ -24,7 +29,11 @@ paths:
       $ref: '../swagger/paths/contacts/{id}/patch.yaml'
     delete:
       $ref: '../swagger/paths/contacts/{id}/delete.yaml'
+
 components:
+  schemas:
+    contact:
+      $ref: '../swagger/components/schemas/contact.yaml'
   securitySchemes:
     bearerAuth:
       type: http

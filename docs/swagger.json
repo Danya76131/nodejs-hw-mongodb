@@ -30,7 +30,7 @@
         ],
         "summary": "Get all contacts",
         "operationId": "getContacts",
-        "description": "Retrieve a list of all contacts, supports optional query parameters",
+        "description": "Retrieve a list of contacts with optional pagination",
         "security": [
           {
             "bearerAuth": []
@@ -42,16 +42,16 @@
             "in": "query",
             "schema": {
               "type": "integer",
-              "example": 10
+              "default": 10
             },
-            "description": "Limit number of contacts returned"
+            "description": "Maximum number of contacts to return"
           },
           {
             "name": "offset",
             "in": "query",
             "schema": {
               "type": "integer",
-              "example": 0
+              "default": 0
             },
             "description": "Number of contacts to skip"
           }
@@ -72,7 +72,7 @@
           }
         }
       },
-      "patch": {
+      "post": {
         "tags": [
           "Contacts"
         ],
@@ -221,7 +221,7 @@
           }
         ],
         "responses": {
-          "200": {
+          "204": {
             "description": "Contact deleted successfully"
           },
           "404": {
@@ -248,7 +248,7 @@
           },
           "name": {
             "type": "string",
-            "example": "User Name"
+            "example": "Contact Name"
           },
           "phoneNumber": {
             "type": "string",
@@ -268,7 +268,7 @@
           },
           "photo": {
             "type": "string",
-            "example": "https://res.cloudinary.com/ddbvyhgxn/image/upload/v1757858117/contacts/photo.png"
+            "example": "https://via.placeholder.com/150"
           },
           "createdAt": {
             "type": "string",
@@ -277,6 +277,10 @@
           "updatedAt": {
             "type": "string",
             "format": "date-time"
+          },
+          "__v": {
+            "type": "integer",
+            "example": 0
           }
         },
         "required": [

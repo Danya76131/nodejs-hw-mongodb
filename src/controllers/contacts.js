@@ -1,12 +1,10 @@
 import {
-  createContact,
   deleteContact,
   getAllContacts,
   getContactById,
   updateContact,
 } from '../services/contacts.js';
 import createHttpError from 'http-errors';
-import { authenticate } from '../middlewares/authenticate.js';
 import { uploadToCloudinary } from '../services/cloudinary.js';
 import { Contact } from '../models/contacts.js';
 
