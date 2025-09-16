@@ -31,7 +31,7 @@
         ],
         "summary": "Get all contacts",
         "operationId": "getContacts",
-        "description": "Retrieve a list of contacts with optional pagination",
+        "description": "Retrieve a list of contacts with optional pagination, sorting and filtering",
         "security": [
           {
             "bearerAuth": []
@@ -39,22 +39,70 @@
         ],
         "parameters": [
           {
-            "name": "limit",
+            "name": "page",
+            "in": "query",
+            "schema": {
+              "type": "integer",
+              "default": 1
+            },
+            "description": "Page number (for pagination)"
+          },
+          {
+            "name": "perPage",
             "in": "query",
             "schema": {
               "type": "integer",
               "default": 10
             },
-            "description": "Maximum number of contacts to return"
+            "description": "Number of contacts per page"
           },
           {
-            "name": "offset",
+            "name": "sortBy",
             "in": "query",
             "schema": {
-              "type": "integer",
-              "default": 0
+              "type": "string",
+              "enum": [
+                "name",
+                "createdAt",
+                "updatedAt"
+              ],
+              "default": "name"
             },
-            "description": "Number of contacts to skip"
+            "description": "Field to sort by"
+          },
+          {
+            "name": "sortOrder",
+            "in": "query",
+            "schema": {
+              "type": "string",
+              "enum": [
+                "asc",
+                "desc"
+              ],
+              "default": "asc"
+            },
+            "description": "Sort order"
+          },
+          {
+            "name": "type",
+            "in": "query",
+            "schema": {
+              "type": "string",
+              "enum": [
+                "work",
+                "home",
+                "personal"
+              ]
+            },
+            "description": "Filter by contact type"
+          },
+          {
+            "name": "isFavourite",
+            "in": "query",
+            "schema": {
+              "type": "boolean"
+            },
+            "description": "Filter by favourite contacts"
           }
         ],
         "responses": {
@@ -70,6 +118,9 @@
                 }
               }
             }
+          },
+          "401": {
+            "description": "Unauthorized (missing or invalid token)"
           }
         }
       },
@@ -91,6 +142,13 @@
             "multipart/form-data": {
               "schema": {
                 "type": "object",
+                "required": [
+                  "name",
+                  "phoneNumber",
+                  "email",
+                  "contactType",
+                  "isFavourite"
+                ],
                 "properties": {
                   "name": {
                     "type": "string"
@@ -99,7 +157,8 @@
                     "type": "string"
                   },
                   "email": {
-                    "type": "string"
+                    "type": "string",
+                    "format": "email"
                   },
                   "isFavourite": {
                     "type": "boolean"
@@ -134,6 +193,9 @@
           },
           "400": {
             "description": "Invalid input data"
+          },
+          "401": {
+            "description": "Unauthorized (missing or invalid token)"
           }
         }
       }
@@ -171,6 +233,12 @@
                 }
               }
             }
+          },
+          "400": {
+            "description": "Invalid contact ID format"
+          },
+          "401": {
+            "description": "Unauthorized - missing or invalid token"
           },
           "404": {
             "description": "Contact not found"
@@ -246,6 +314,12 @@
               }
             }
           },
+          "400": {
+            "description": "Invalid contact ID or invalid request body"
+          },
+          "401": {
+            "description": "Unauthorized - missing or invalid token"
+          },
           "404": {
             "description": "Contact not found"
           }
@@ -276,6 +350,12 @@
         "responses": {
           "204": {
             "description": "Contact deleted successfully"
+          },
+          "400": {
+            "description": "Invalid contact ID"
+          },
+          "401": {
+            "description": "Unauthorized - missing or invalid token"
           },
           "404": {
             "description": "Contact not found"
@@ -343,7 +423,8 @@
           "_id",
           "name",
           "phoneNumber",
-          "userId"
+          "userId",
+          "contactType"
         ]
       }
     },

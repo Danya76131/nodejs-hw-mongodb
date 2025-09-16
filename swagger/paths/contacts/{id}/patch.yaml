@@ -39,5 +39,9 @@ responses:
       application/json:
         schema:
           $ref: '../../../components/schemas/contact.yaml'
+  '400':
+    description: Invalid contact ID or invalid request body
+  '401':
+    description: Unauthorized - missing or invalid token
   '404':
     description: Contact not found

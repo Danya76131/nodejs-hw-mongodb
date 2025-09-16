@@ -39,3 +39,4 @@ required:
   - name
   - phoneNumber
   - userId
+  - contactType

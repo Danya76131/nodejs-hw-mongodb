@@ -2,22 +2,47 @@ tags:
   - Contacts
 summary: Get all contacts
 operationId: getContacts
-description: Retrieve a list of contacts with optional pagination
+description: Retrieve a list of contacts with optional pagination, sorting and filtering
 security:
   - bearerAuth: []
 parameters:
-  - name: limit
+  - name: page
+    in: query
+    schema:
+      type: integer
+      default: 1
+    description: Page number (for pagination)
+  - name: perPage
     in: query
     schema:
       type: integer
       default: 10
-    description: Maximum number of contacts to return
-  - name: offset
+    description: Number of contacts per page
+  - name: sortBy
     in: query
     schema:
-      type: integer
-      default: 0
-    description: Number of contacts to skip
+      type: string
+      enum: [name, createdAt, updatedAt]
+      default: name
+    description: Field to sort by
+  - name: sortOrder
+    in: query
+    schema:
+      type: string
+      enum: [asc, desc]
+      default: asc
+    description: Sort order
+  - name: type
+    in: query
+    schema:
+      type: string
+      enum: [work, home, personal]
+    description: Filter by contact type
+  - name: isFavourite
+    in: query
+    schema:
+      type: boolean
+    description: Filter by favourite contacts
 responses:
   '200':
     description: List of contacts
@@ -27,3 +52,5 @@ responses:
           type: array
           items:
             $ref: '../../components/schemas/contact.yaml'
+  '401':
+    description: Unauthorized (missing or invalid token)

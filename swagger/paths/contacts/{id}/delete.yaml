@@ -14,5 +14,9 @@ parameters:
 responses:
   '204':
     description: Contact deleted successfully
+  '400':
+    description: Invalid contact ID
+  '401':
+    description: Unauthorized - missing or invalid token
   '404':
     description: Contact not found

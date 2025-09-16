@@ -11,6 +11,12 @@ requestBody:
     multipart/form-data:
       schema:
         type: object
+        required:
+          - name
+          - phoneNumber
+          - email
+          - contactType
+          - isFavourite
         properties:
           name:
             type: string
@@ -18,6 +24,7 @@ requestBody:
             type: string
           email:
             type: string
+            format: email
           isFavourite:
             type: boolean
           contactType:
@@ -35,3 +42,5 @@ responses:
           $ref: '../../components/schemas/contact.yaml'
   '400':
     description: Invalid input data
+  '401':
+    description: Unauthorized (missing or invalid token)
